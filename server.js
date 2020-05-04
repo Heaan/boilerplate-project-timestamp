@@ -26,12 +26,24 @@ app.get('/api/hello', function(req, res) {
   res.json({ greeting: 'hello API' });
 });
 
+const isValidDate = (date) => date instanceof Date && !isNaN(date.getTime());
+
+const getDateJson = (date_string) => {
+  let date = {};
+  if (date_string === '') {
+    date = new Date();
+    return {
+      unix: date.getTime(),
+      utc: date.toUTCString(),
+    };
+  }
+  date = new Date(date_string);
+  date = !isValidDate(date) && /^-?\d*$/.test(date_string) ? new Date(+date_string) : date;
+  return isValidDate(date) ? { unix: date.getTime(), utc: date.toUTCString() } : { error: 'Invalid Date' };
+};
+
 app.route('/api/timestamp/:date_string?').get((req, res) => {
-  const date_string = req.params.date_string;
-  const date = date_string ? new Date(date_string) : new Date();
-  const unix_date_string = date.getTime();
-  const utc_date_string = date.toUTCString();
-  const date_json = date ? { unix: unix_date_string, utc: utc_date_string } : { error: 'Invalid Date' };
+  const date_json = getDateJson(req.params.date_string);
   res.json(date_json);
 });
 
