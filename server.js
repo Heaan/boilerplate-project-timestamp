@@ -31,7 +31,8 @@ app.route('/api/timestamp/:date_string?').get((req, res) => {
   const date = date_string ? new Date(date_string) : new Date();
   const unix_date_string = date.getTime();
   const utc_date_string = date.toUTCString();
-  res.json({ unix: unix_date_string, utc: utc_date_string });
+  const date_json = date ? { unix: unix_date_string, utc: utc_date_string } : { error: 'Invalid Date' };
+  res.json(date_json);
 });
 
 // listen for requests :)
